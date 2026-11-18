@@ -1,0 +1,105 @@
+name: Android Release Build & GitHub Release
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version_tag:
+        description: 'Version Tag (e.g. v1.0.0)'
+        required: true
+        default: 'v1.0.0'
+      release_title:
+        description: 'Release Title'
+        required: false
+        default: 'CareXpress BIZDEV Field Visit & KPI Tracker'
+      release_notes:
+        description: 'Release Notes / Changelog'
+        required: false
+        default: 'Automated release build with signed APK and verified KPI engine tests.'
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    name: Test, Build & Publish Signed APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Setup Gradle 8.7
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Generate Wrapper if missing
+        run: |
+          gradle wrapper
+          chmod +x gradlew
+
+      - name: Run Unit Tests (KPI Engine & XLSX Exporter)
+        run: |
+          ./gradlew testDebugUnitTest --stacktrace
+
+      - name: Build Signed Release APK
+        run: |
+          ./gradlew assembleRelease --stacktrace
+
+      - name: Prepare APK Asset
+        id: prepare_apk
+        run: |
+          TAG_NAME="${{ github.event.inputs.version_tag || github.ref_name }}"
+          if [ -z "$TAG_NAME" ] || [ "$TAG_NAME" = "main" ]; then
+            TAG_NAME="v1.0.0"
+          fi
+          echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+
+          OUTPUT_DIR="app/build/outputs/apk/release"
+          APK_NAME="carexpress-bizdev-${TAG_NAME}.apk"
+
+          if [ -f "$OUTPUT_DIR/app-release.apk" ]; then
+            cp "$OUTPUT_DIR/app-release.apk" "$APK_NAME"
+          elif [ -f "$OUTPUT_DIR/app-release-unsigned.apk" ]; then
+            cp "$OUTPUT_DIR/app-release-unsigned.apk" "$APK_NAME"
+          else
+            FOUND_APK=$(find app/build/outputs/apk -name "*.apk" | head -n 1)
+            cp "$FOUND_APK" "$APK_NAME"
+          fi
+
+          echo "apk_path=$APK_NAME" >> $GITHUB_OUTPUT
+          ls -lh "$APK_NAME"
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.prepare_apk.outputs.tag_name }}-apk
+          path: ${{ steps.prepare_apk.outputs.apk_path }}
+          retention-days: 30
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+        with:
+          tag_name: ${{ steps.prepare_apk.outputs.tag_name }}
+          name: ${{ github.event.inputs.release_title || steps.prepare_apk.outputs.tag_name }}
+          body: ${{ github.event.inputs.release_notes || 'Automated signed release build of CareXpress BIZDEV Field Visit & KPI Tracker.' }}
+          draft: false
+          prerelease: false
+          files: ${{ steps.prepare_apk.outputs.apk_path }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
