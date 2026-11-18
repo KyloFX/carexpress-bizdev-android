@@ -53,7 +53,7 @@ def main():
         run_cmd("git add -A")
         run_cmd(f'git commit -m "chore: prepare release {tag}"')
 
-    run_cmd("git push origin HEAD")
+    run_cmd("git push origin HEAD --force")
     subprocess.run(f"git tag -d {tag}", shell=True, capture_output=True)
     subprocess.run(f"git push origin :refs/tags/{tag}", shell=True, capture_output=True)
     run_cmd(f'git tag -a {tag} -m "{notes}"')
