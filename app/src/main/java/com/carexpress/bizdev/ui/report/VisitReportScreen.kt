@@ -11,6 +11,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -150,7 +151,11 @@ private fun KpiBanner(b: BannerMetrics) {
         M("Proposals Sent", b.proposalsSent.grouped(), Icons.Outlined.Assignment),
         M("Contracts Won", b.contractsWon.grouped(), Icons.Outlined.EmojiEvents),
     )
-    LazyRow(contentPadding = PaddingValues(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+    LazyRow(
+        modifier = Modifier.focusable(),
+        contentPadding = PaddingValues(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
         items(metrics, key = { it.label }) { m ->
             KpiMetricCard(m.label, m.value, m.icon, Modifier.width(if (m.hl) 180.dp else 148.dp), highlight = m.hl)
         }

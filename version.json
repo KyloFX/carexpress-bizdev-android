@@ -1,14 +1,14 @@
 {
-  "version": "1.0.0",
-  "tag_name": "v1.0.0",
-  "name": "CareXpress BIZDEV Tracker v1.0.0",
-  "body": "Initial production release of CareXpress BIZDEV Field Visit & KPI Tracker",
-  "download_url": "https://github.com/KyloFX/carexpress-bizdev-android/releases/download/v1.0.0/carexpress-bizdev-v1.0.0.apk",
-  "apk_name": "carexpress-bizdev-v1.0.0.apk",
+  "version": "1.0.2",
+  "tag_name": "v1.0.2",
+  "name": "CareXpress BIZDEV Tracker v1.0.2",
+  "body": "v1.0.2 \u2014 UX polish: prevent auto-keyboard popup & responsive landscape modal sheet",
+  "download_url": "https://github.com/KyloFX/carexpress-bizdev-android/releases/download/v1.0.2/carexpress-bizdev-v1.0.2.apk",
+  "apk_name": "carexpress-bizdev-v1.0.2.apk",
   "assets": [
     {
-      "name": "carexpress-bizdev-v1.0.0.apk",
-      "browser_download_url": "https://github.com/KyloFX/carexpress-bizdev-android/releases/download/v1.0.0/carexpress-bizdev-v1.0.0.apk",
+      "name": "carexpress-bizdev-v1.0.2.apk",
+      "browser_download_url": "https://github.com/KyloFX/carexpress-bizdev-android/releases/download/v1.0.2/carexpress-bizdev-v1.0.2.apk",
       "size": 0,
       "content_type": "application/vnd.android.package-archive"
     }

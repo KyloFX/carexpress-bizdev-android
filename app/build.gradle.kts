@@ -12,10 +12,10 @@ android {
 
     defaultConfig {
         applicationId = "com.carexpress.bizdev"
-        minSdk = 26
+        minSdk = 24
         targetSdk = 34
-        versionCode = (project.findProperty("versionCode") as String?)?.toInt() ?: 1
-        versionName = (project.findProperty("versionName") as String?) ?: "1.0.0"
+        versionCode = (project.findProperty("versionCode") as String?)?.toInt() ?: 3
+        versionName = (project.findProperty("versionName") as String?) ?: "1.0.2"
         vectorDrawables { useSupportLibrary = true }
 
         buildConfigField("String", "GITHUB_OWNER", "\"KyloFX\"")
@@ -42,6 +42,7 @@ android {
         }
     }
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
@@ -62,6 +63,7 @@ android {
 ksp { arg("room.schemaLocation", "$projectDir/schemas") }
 
 dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.2")
     val composeBom = platform("androidx.compose:compose-bom:2024.09.03")
     implementation(composeBom)
     implementation("androidx.core:core-ktx:1.13.1")
